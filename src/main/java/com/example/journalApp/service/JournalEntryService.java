@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Component
 public class JournalEntryService {
+
     @Autowired
     private JournalEntryRepo journalEntryRepo;
 
