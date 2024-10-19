@@ -30,7 +30,7 @@ public class JournalEntryService {
         journalEntry.setDate(LocalDateTime.now());
         JournalEntry saved = journalEntryRepo.save(journalEntry);
         user.getJournalEntries().add(saved);
-        userService.saveEntry(user);
+        userService.saveUser(user);
     }
 
     public void saveEntry(JournalEntry journalEntry){
@@ -45,17 +45,19 @@ public class JournalEntryService {
         return journalEntryRepo.findById(id);
     }
 
-    public void deleteById(ObjectId id, String username) throws Exception {
-        User user = userService.findByUsername(username);
-        if (user == null) {
-            throw new Exception("User not found");
+    public boolean deleteById(ObjectId id, String username) {
+        boolean removed = false;
+        try {
+            User user = userService.findByUsername(username);
+            removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
+            if (removed) {
+                userService.saveNewUser(user); // Save updated user after removal
+                journalEntryRepo.deleteById(id); // Delete the journal entry from the database
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException("An error occurred while deleting the entry.", e);
         }
-        boolean removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
-        if (removed) {
-            userService.saveEntry(user); // Save updated user after removal
-            journalEntryRepo.deleteById(id); // Delete the journal entry from the database
-        } else {
-            throw new Exception("Journal entry not found for deletion");
-        }
+
+        return removed;
     }
 }
