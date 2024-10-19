@@ -1,11 +1,14 @@
 package com.example.journalApp.service;
 
 import com.example.journalApp.entity.User;
-import com.example.journalApp.repository.UserRepo;
+import com.example.journalApp.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,26 +16,33 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepository;
+
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public void saveEntry(User user){
-        System.out.println("saving user" + user);
-        userRepo.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("USER"));
+        userRepository.save(user);
+    }
+
+    public void saveNewUser(User user){
+        userRepository.save(user);
     }
 
     public List<User> getAllUser(){
-        return userRepo.findAll();
+        return userRepository.findAll();
     }
 
     public Optional<User> findById(ObjectId id){
-        return userRepo.findById(id);
+        return userRepository.findById(id);
     }
 
     public void deleteById(ObjectId id){
-        userRepo.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     public User findByUsername(String username){
-        return userRepo.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 }
