@@ -3,6 +3,14 @@ spring:
     active: dev
 
 
+weather:
+  api:
+    key: a9365e5641eed7a34457974b4c47546f
+
+#weather_api_key: a9365e5641eed7a34457974b4c47546f
+
+
+
 #logging:
 #  level:
 #    net:
