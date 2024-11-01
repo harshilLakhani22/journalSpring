@@ -2,7 +2,7 @@ package com.example.journalApp.service;
 
 import com.example.journalApp.entity.JournalEntry;
 import com.example.journalApp.entity.User;
-import com.example.journalApp.repository.JournalEntryRepo;
+import com.example.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class JournalEntryService {
 
     @Autowired
-    private JournalEntryRepo journalEntryRepo;
+    private JournalEntryRepository journalEntryRepository;
 
     @Autowired
     private UserService userService;
@@ -28,21 +28,21 @@ public class JournalEntryService {
             throw new Exception("User not found");
         }
         journalEntry.setDate(LocalDateTime.now());
-        JournalEntry saved = journalEntryRepo.save(journalEntry);
+        JournalEntry saved = journalEntryRepository.save(journalEntry);
         user.getJournalEntries().add(saved);
         userService.saveUser(user);
     }
 
     public void saveEntry(JournalEntry journalEntry){
-        journalEntryRepo.save(journalEntry);
+        journalEntryRepository.save(journalEntry);
     }
 
     public List<JournalEntry> getAllEntry(){
-        return journalEntryRepo.findAll();
+        return journalEntryRepository.findAll();
     }
 
     public Optional<JournalEntry> findById(ObjectId id){
-        return journalEntryRepo.findById(id);
+        return journalEntryRepository.findById(id);
     }
 
     public boolean deleteById(ObjectId id, String username) {
@@ -52,7 +52,7 @@ public class JournalEntryService {
             removed = user.getJournalEntries().removeIf(x -> x.getId().equals(id));
             if (removed) {
                 userService.saveNewUser(user); // Save updated user after removal
-                journalEntryRepo.deleteById(id); // Delete the journal entry from the database
+                journalEntryRepository.deleteById(id); // Delete the journal entry from the database
             }
         } catch (RuntimeException e) {
             throw new RuntimeException("An error occurred while deleting the entry.", e);
